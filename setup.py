@@ -19,9 +19,9 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = "fynesse"
 DESCRIPTION = "Template files for performing fynesse pipeline data analysis with python."
-URL = "https://github.com/lawrennd/fynesse_template"
-EMAIL = "emal@domain.here"
-AUTHOR = "Givenname Familyname"
+URL = "https://github.com/ravenstorm2001/advds"
+EMAIL = "mm2507@cam.ac.uk"
+AUTHOR = "Mihailo Milosevic"
 REQUIRES_PYTHON = ">=3.6.0"
 VERSION = "0.1.0"
 
