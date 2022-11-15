@@ -1,3 +1,3 @@
-from . import access
-from . import assess
-from . import process
+from fynesse import access
+from fynesse import assess
+from fynesse import process
