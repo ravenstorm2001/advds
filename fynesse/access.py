@@ -96,4 +96,31 @@ def load_postcodes(conn, headers):
         
     load(conn, 'postcode_data', 'open_postcode_geo.csv/open_postcode_geo.csv', ',', '', '\n')
     
+def joinAndStorePriceAndLocationData(conn, longitudeMin, longitudeMax, lattitudeMin, lattitudeMax, dateMin, dateMax):
+    """
+    Function that takes two tables and stores their inner join into the third.
+
+    Arguments:
+      conn : Connection Object - connection to database
+      longitudeMin : double - minimum limit for box of interest of longitude
+      longitudeMax : double - maximum limit for box of interest of longitude
+      lattitudeMin : double - minimum limit for box of interest of lattitude
+      lattitudeMax : double - maximum limit for box of interest of lattitude
+      dateMin : string - minimum limit for time of interest of date e.g. '2018-01-01'
+      dateMax : string - maximum limit for time of interest of date e.g. '2018-12-31'
+    Outputs:
+      N/A 
+    """
+    cur = conn.cursor()
+    # Execute Query
+    cur.execute(f"INSERT INTO prices_coordinates_data \n" + 
+                f"SELECT pp.price, pp.date_of_transfer, pp.postcode, pp.property_type, pp.new_build_flag, pp.tenure_type, pp.locality, pp.town_city, pp.district, pp.county, pc.country, pc.lattitude, pc.longitude, pp.db_id \n" +
+                f"FROM \n" +
+                f"(SELECT db_id, price, date_of_transfer, postcode, property_type, new_build_flag, tenure_type, locality, town_city, district, county FROM pp_data WHERE date_of_transfer >= '{dateMin}' AND date_of_transfer <= '{dateMax}') pp \n" +
+                f"INNER JOIN \n" +
+                f"(SELECT postcode, country, lattitude, longitude FROM postcode_data WHERE (longitude BETWEEN {str(longitudeMin)} AND {str(longitudeMax)}) AND (lattitude BETWEEN {str(lattitudeMin)} AND {str(lattitudeMax)})) pc \n" +
+                f"ON \n" +
+                f"pp.postcode = pc.postcode;")
+    # Commit Results
+    conn.commit()
     
