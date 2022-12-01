@@ -6,6 +6,7 @@ from progressbar import ProgressBar
 import zipfile
 import requests
 import pandas as pd
+import osmnx as ox
 
 # This file accesses the data
 
@@ -18,13 +19,13 @@ def create_connection(user, password, host, database, port=3306):
     Create a database connection to the MariaDB database specified by the host url and database name.
 
     Argument:
-        user : (string) - username
-        password : (string) - password
-        host : (string) - host url
-        database : (string) - database name
-        port : (int) - port number
+      user : (string) - username
+      password : (string) - password
+      host : (string) - host url
+      database : (string) - database name
+      port : (int) - port number
     Output:
-        conn : (Connection object)/None - connection object
+      conn : (Connection object)/None - connection object
     """
     conn = None
     try:
@@ -44,14 +45,14 @@ def load(conn, table, file, field_term = "\",\"", lines_start = "\"", lines_term
     Load data from file to table
 
     Argument:
-        conn : (Connection object) - connection to database
-        table : (string) - table name
-        file : (string) - csv file name
-        field_term : (string) - end of each field
-        lines_start : (string) - start of each csv line
-        lines_term : (string) - end of each csv line
+      conn : (Connection object) - connection to database
+      table : (string) - table name
+      file : (string) - csv file name
+      field_term : (string) - end of each field
+      lines_start : (string) - start of each csv line
+      lines_term : (string) - end of each csv line
     Output:
-        N/A
+      N/A
     """
     cur = conn.cursor()
     cur.execute(f"LOAD DATA LOCAL INFILE '{file}' INTO TABLE {table} FIELDS TERMINATED BY '{field_term}' LINES STARTING BY '{lines_start}' TERMINATED BY '{lines_term}';")
@@ -62,12 +63,12 @@ def load_transactions(conn, table, start_year, end_year):
     Load all transaction data from files downloaded from uk.gov to table
 
     Argument:
-        conn : (Connection object) - connection to database
-        table : (string) - table name
-        start_year : (int) - download transactions from year
-        end_year : (int) - download transaction to year (excluding the year)
+      conn : (Connection object) - connection to database
+      table : (string) - table name
+      start_year : (int) - download transactions from year
+      end_year : (int) - download transaction to year (excluding the year)
     Output:
-        N/A
+      N/A
     """
     pbar = ProgressBar()
 
@@ -81,10 +82,10 @@ def load_postcodes(conn, headers):
     Load all postcode data to the table
 
     Argument:
-        conn : (Connection object) - connection to database
-        headers : (dicctionary) - necessary headers to download data
+      conn : (Connection object) - connection to database
+      headers : (dicctionary) - necessary headers to download data
     Output:
-        N/A
+      N/A
     """
     resp1 = requests.get('https://www.getthedata.com/downloads/open_postcode_geo.csv.zip',headers=headers)
 
@@ -172,4 +173,68 @@ def joinPriceAndLocationData(conn, longitudeMin, longitudeMax, lattitudeMin, lat
     # Collect Data
     rows = cur.fetchall()
     return pd.DataFrame(rows, columns = ['price', 'date_of_transfer', 'postcode', 'property_type', 'new_build_flag', 'tenure_type', 'locality', 'town_city', 'district', 'county', 'country', 'lattitude', 'longitude', 'db_id'])
+
+def calculate_boundaries(latitude = 52.35, longitude = -2.25, size = 0.1):
+    """
+    Function that returns boundaries of a box we are looking at
+
+    Arguments:
+      latitude : double - prediction point latitude
+      longitude : double - prediction point longitude
+      size : double - width/height of box of interest
+    Outputs:
+      (north, south, west, east) : (double, double, double, double) - boundaries of the box
+    """  
+    box_width = size
+    box_height = size
+    north = latitude + box_height/2
+    south = latitude - box_height/2
+    west = longitude - box_width/2
+    east = longitude + box_width/2
+
+  return (north, south, west, east)
+
+def download_pois(latitude = 52.35, longitude = -2.25, size = 0.1, tags = {"amenity": True, 
+                                                                           "buildings": True, 
+                                                                           "historic": True, 
+                                                                           "leisure": True, 
+                                                                           "shop": True, 
+                                                                           "tourism": True}):
+    """
+    Function that returns boundaries of a box we are looking at
+
+    Arguments:
+      latitude : double - prediction point latitude
+      longitude : double - prediction point longitude
+      size : double - width/height of box of interest
+      tags : dictionary - points of interest that we want to download
+    Outputs:
+      pois : DataFrame - points of interest from OSM
+    """  
+  (north, south, west, east) = calculate_boundaries(latitude, longitude, size)
+
+  pois = ox.geometries_from_bbox(north, south, east, west, tags)
+
+  return pois
+
+def download_graph(latitude = 52.35, longitude = -2.25, size = 0.1):
+    """
+    Function that returns boundaries of a box we are looking at
+
+    Arguments:
+      latitude : double - prediction point latitude
+      longitude : double - prediction point longitude
+      size : double - width/height of box of interest
+    Outputs:
+      (nodes, edges) - map features for plotting phase
+    """  
+    (north, south, west, east) = calculate_boundaries(latitude, longitude, size)
+  
+    graph = ox.graph_from_bbox(north, south, east, west)
+
+    # Retrieve nodes and edges
+    nodes, edges = ox.graph_to_gdfs(graph)
+
+    return (nodes, edges)
+
 
