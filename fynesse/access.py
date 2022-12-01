@@ -192,7 +192,7 @@ def calculate_boundaries(latitude = 52.35, longitude = -2.25, size = 0.1):
     west = longitude - box_width/2
     east = longitude + box_width/2
 
-  return (north, south, west, east)
+    return (north, south, west, east)
 
 def download_pois(latitude = 52.35, longitude = -2.25, size = 0.1, tags = {"amenity": True, 
                                                                            "buildings": True, 
@@ -211,11 +211,11 @@ def download_pois(latitude = 52.35, longitude = -2.25, size = 0.1, tags = {"amen
     Outputs:
       pois : DataFrame - points of interest from OSM
     """  
-  (north, south, west, east) = calculate_boundaries(latitude, longitude, size)
+    (north, south, west, east) = calculate_boundaries(latitude, longitude, size)
 
-  pois = ox.geometries_from_bbox(north, south, east, west, tags)
+    pois = ox.geometries_from_bbox(north, south, east, west, tags)
 
-  return pois
+    return pois
 
 def download_graph(latitude = 52.35, longitude = -2.25, size = 0.1):
     """
