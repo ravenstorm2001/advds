@@ -11,6 +11,8 @@ import pandas as pd
 
 """Place commands in this file to access the data electronically. Don't remove any missing values, or deal with outliers. Make sure you have legalities correct, both intellectual property and personal data privacy rights. Beyond the legal side also think about the ethical issues around this data. """
 
+
+
 def create_connection(user, password, host, database, port=3306):
     """ 
     Create a database connection to the MariaDB database specified by the host url and database name.
