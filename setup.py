@@ -27,7 +27,7 @@ VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "pandas", "numpy", "jupyter", "matplotlib", "pyyaml", "ipython-sql", "PyMySQL", "requests", "osmnx",
+    "pandas", "numpy", "jupyter", "matplotlib", "pyyaml", "ipython-sql", "PyMySQL", "requests", "osmnx", "geopandas", "mlai",
 ]
 
 # What packages are optional?
