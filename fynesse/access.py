@@ -171,5 +171,5 @@ def joinPriceAndLocationData(conn, longitudeMin, longitudeMax, lattitudeMin, lat
                 f"WHERE (longitude BETWEEN {str(longitudeMin)} AND {str(longitudeMax)}) AND (lattitude BETWEEN {str(lattitudeMin)} AND {str(lattitudeMax)});")
     # Collect Data
     rows = cur.fetchall()
-    return pd.DataFrame(rows, columns = ['price',	'date_of_transfer',	'postcode',	'property_type',	'new_build_flag',	'tenure_type',	'locality',	'town_city',	'district',	'county',	'country',	'lattitude',	'longitude',	'db_id'])
+    return pd.DataFrame(rows, columns = ['price', 'date_of_transfer', 'postcode', 'property_type', 'new_build_flag', 'tenure_type', 'locality', 'town_city', 'district', 'county', 'country', 'lattitude', 'longitude', 'db_id'])
 
