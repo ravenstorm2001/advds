@@ -3,6 +3,8 @@ from .config import *
 import pymysql
 import urllib.request
 from progressbar import ProgressBar
+import zipfile
+import requests
 
 # This file accesses the data
 
@@ -70,3 +72,28 @@ def load_transactions(conn, table, start_year, end_year):
         for j in range(1,3):
             urllib.request.urlretrieve('http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%d-part%d.csv' % (i,j), 'data.csv')
             load(conn, table, 'data.csv', "\",\"", "\"", "\"\n")
+
+def load_postcodes(conn, headers):
+    """
+    Load all postcode data to the table
+
+    Argument:
+        conn : (Connection object) - connection to database
+        headers : (dicctionary) - necessary headers to download data
+    Output:
+        N/A
+    """
+    resp1 = requests.get('https://www.getthedata.com/downloads/open_postcode_geo.csv.zip',headers=headers)
+
+    with open('open_postcode_geo.csv.zip', 'wb') as handle:
+        for block in resp1.iter_content(1024):
+            if not block:
+                break
+            handle.write(block)
+
+    with zipfile.ZipFile('open_postcode_geo.csv.zip', 'r') as zip_ref:
+        zip_ref.extractall('open_postcode_geo.csv')    
+        
+    load(conn, 'postcode_data', 'open_postcode_geo.csv/open_postcode_geo.csv', ',', '', '\n')
+    
+    
