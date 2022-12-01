@@ -1,6 +1,6 @@
 from .config import *
 
-from access import *
+from .access import *
 
 import mlai
 import mlai.plot as plot
