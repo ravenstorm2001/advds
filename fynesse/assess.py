@@ -35,7 +35,7 @@ def download_data_to_gdf(conn, latitude, longitude, size, from_date, to_date):
     data_gdf.crs = "EPSG:4326"
     return data_gdf
 
-def plot_points_interest(pois, edges, data_gdf, latitude = 52.35, longitude = -2.25, size = 0.1):
+def plot_points_interest(pois, edges, data_gdf, latitude = 52.35, longitude = -2.25, size = 0.1, plot_title = 'All Data'):
     """
     Function that downloads data and adds geometry column.
   
@@ -51,7 +51,7 @@ def plot_points_interest(pois, edges, data_gdf, latitude = 52.35, longitude = -2
     """
     fig, ax = plt.subplots(figsize=plot.big_figsize)
     
-    ax.set_title('All Data Points')
+    ax.set_title(plot_title)
     # Plot street edges
     edges.plot(ax=ax, linewidth=1, edgecolor="dimgray")
 
