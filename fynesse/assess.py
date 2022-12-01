@@ -2,13 +2,13 @@ from .config import *
 
 from . import access
 
-"""These are the types of import we might expect in this file
-import pandas
-import bokeh
-import seaborn
+import mlai
+import mlai.plot as plot
+import geopandas as gpd
 import matplotlib.pyplot as plt
-import sklearn.decomposition as decomposition
-import sklearn.feature_extraction"""
+
+# Setting font of our plots
+plt.rcParams.update({'font.size': 22})
 
 """Place commands in this file to assess the data you have downloaded. How are missing values encoded, how are outliers encoded? What do columns represent, makes rure they are correctly labeled. How is the data indexed. Crete visualisation routines to assess the data (e.g. in bokeh). Ensure that date formats are correct and correctly timezoned."""
 
