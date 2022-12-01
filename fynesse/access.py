@@ -34,11 +34,12 @@ def create_connection(user, password, host, database, port=3306):
         print(f"Error connecting to the MariaDB Server: {e}")
     return conn
 
-def load(table, file, field_term = "\",\"", lines_start = "\"", lines_term = "\"\n"):
+def load(conn, table, file, field_term = "\",\"", lines_start = "\"", lines_term = "\"\n"):
     """ 
     Load data from file to table
 
     Argument:
+        conn : (Connection object) - connection to database
         table : (string) - table name
         file : (string) - csv file name
         field_term : (string) - end of each field
@@ -47,26 +48,19 @@ def load(table, file, field_term = "\",\"", lines_start = "\"", lines_term = "\"
     Output:
         N/A
     """
-    conn = create_connection(user=credentials["username"], 
-                         password=credentials["password"], 
-                         host=database_details["url"],
-                         database="property_prices")
     cur = conn.cursor()
     cur.execute(f"LOAD DATA LOCAL INFILE '{file}' INTO TABLE {table} FIELDS TERMINATED BY '{field_term}' LINES STARTING BY '{lines_start}' TERMINATED BY '{lines_term}';")
     conn.commit()
-    conn.close()
     
-def load_transactions(table, start_year, end_year):
+def load_transactions(conn, table, start_year, end_year):
     """
     Load all transaction data from files downloaded from uk.gov to table
 
     Argument:
+        conn : (Connection object) - connection to database
         table : (string) - table name
         start_year : (int) - download transactions from year
         end_year : (int) - download transaction to year (excluding the year)
-        field_term : (string) - end of each field
-        lines_start : (string) - start of each csv line
-        lines_term : (string) - end of each csv line
     Output:
         N/A
     """
@@ -75,4 +69,4 @@ def load_transactions(table, start_year, end_year):
     for i in pbar(range(start_year, end_year)):
         for j in range(1,3):
             urllib.request.urlretrieve('http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%d-part%d.csv' % (i,j), 'data.csv')
-            load(table, 'data.csv', "\",\"", "\"", "\"\n")
+            load(conn, table, 'data.csv', "\",\"", "\"", "\"\n")
