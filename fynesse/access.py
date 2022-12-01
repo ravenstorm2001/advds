@@ -5,6 +5,7 @@ import urllib.request
 from progressbar import ProgressBar
 import zipfile
 import requests
+import pandas as pd
 
 # This file accesses the data
 
@@ -98,7 +99,7 @@ def load_postcodes(conn, headers):
     
 def joinAndStorePriceAndLocationData(conn, longitudeMin, longitudeMax, lattitudeMin, lattitudeMax, dateMin, dateMax):
     """
-    Function that takes two tables and stores their inner join into the third.
+    Function that joins location and price data and stores it into the third table.
 
     Arguments:
       conn : Connection Object - connection to database
@@ -124,3 +125,49 @@ def joinAndStorePriceAndLocationData(conn, longitudeMin, longitudeMax, lattitude
     # Commit Results
     conn.commit()
     
+def fetch_data(conn, table_name, columns):
+    """
+    Extracts data from database required to do assess and address part.
+
+    Arguments:
+      conn : connection object - Connection to the database we want to extract data from
+      table_name : string - name of the table
+      columns : list(string) - columns that table has
+    Output:
+      rows : tuple - data extracted as tuple 
+    """
+    cur = conn.cursor()
+    cur.execute(f"SELECT * FROM {table_name}")
+
+    rows = cur.fetchall()
+    return pd.DataFrame(rows, columns = columns)
+
+def joinPriceAndLocationData(conn, longitudeMin, longitudeMax, lattitudeMin, lattitudeMax, dateMin, dateMax):
+    """
+    Function that joins price and location data and returns dataframe.
+
+    Arguments:
+      conn : connection object - Connection to the database we want to extract data from
+      longitudeMin : double - minimum limit for box of interest of longitude
+      longitudeMax : double - maximum limit for box of interest of longitude
+      lattitudeMin : double - minimum limit for box of interest of lattitude
+      lattitudeMax : double - maximum limit for box of interest of lattitude
+      dateMin : string - minimum limit for time of interest of date e.g. '2018-01-01'
+      dateMax : string - maximum limit for time of interest of date e.g. '2018-12-31'
+    Outputs:
+      data : DataFrame - joined data for exploration
+    """
+    cur = conn.cursor()
+    # Execute Query
+    cur.execute(f"SELECT pp.price, pp.date_of_transfer, pp.postcode, pp.property_type, pp.new_build_flag, pp.tenure_type, pp.locality, pp.town_city, pp.district, pp.county, pc.country, pc.lattitude, pc.longitude, pp.db_id \n" +
+                f"FROM \n" +
+                f"(SELECT postcode, country, lattitude, longitude FROM postcode_data) pc \n" +
+                f"INNER JOIN \n" +
+                f"(SELECT db_id, price, date_of_transfer, postcode, property_type, new_build_flag, tenure_type, locality, town_city, district, county FROM pp_data WHERE date_of_transfer >= '{dateMin}' AND date_of_transfer <= '{dateMax}') pp \n" +
+                f"ON \n" +
+                f"pp.postcode = pc.postcode\n" +
+                f"WHERE (longitude BETWEEN {str(longitudeMin)} AND {str(longitudeMax)}) AND (lattitude BETWEEN {str(lattitudeMin)} AND {str(lattitudeMax)});")
+    # Collect Data
+    rows = cur.fetchall()
+    return pd.DataFrame(rows, columns = ['price',	'date_of_transfer',	'postcode',	'property_type',	'new_build_flag',	'tenure_type',	'locality',	'town_city',	'district',	'county',	'country',	'lattitude',	'longitude',	'db_id'])
+
