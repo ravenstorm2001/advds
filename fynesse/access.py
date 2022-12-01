@@ -63,7 +63,7 @@ def load_transactions(table, start_year, end_year):
     Argument:
         table : (string) - table name
         start_year : (int) - download transactions from year
-        end_year : (int) - download transaction to year
+        end_year : (int) - download transaction to year (excluding the year)
         field_term : (string) - end of each field
         lines_start : (string) - start of each csv line
         lines_term : (string) - end of each csv line
