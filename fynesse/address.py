@@ -1,5 +1,6 @@
 # This file contains code for suporting addressing questions in the data
 from .access import *
+from .assess import *
 
 import numpy as np
 import statsmodels.api as sm
