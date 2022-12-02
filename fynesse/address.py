@@ -73,7 +73,7 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
         closest_leisure_pred = pois_leisure.geometry.distance(gdf_pred.geometry[0]).min()
         design_pred = np.concatenate((design_pred, [[closest_leisure_pred]]),axis=1)
     y_pred_linear_basis = results_basis.get_prediction(design_pred).summary_frame(alpha=0.05)
-    print(desing_pred)
+    print(design_pred)
     print(results_basis.summary())
     print(y_pred_linear_basis)
     pass
