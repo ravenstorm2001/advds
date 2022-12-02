@@ -54,11 +54,13 @@ def plot_points_interest(pois, edges, data_gdf, latitude = 52.35, longitude = -2
     ax.set_title(plot_title)
     # Plot street edges
     edges.plot(ax=ax, linewidth=1, edgecolor="dimgray")
-
+    
+    # Plot transaction data
     data_gdf.plot(ax=ax, c=data_gdf.price/data_gdf.price.max()*100, cmap = 'YlOrRd', markersize=10)
 
     (north, south, west, east) = calculate_boundaries(latitude = latitude, longitude = longitude, size = size)
-
+    
+    # Set bounds on the plot
     ax.set_xlim([west, east])
     ax.set_ylim([south, north])
     ax.set_xlabel("longitude")
