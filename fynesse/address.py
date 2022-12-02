@@ -6,8 +6,6 @@ import numpy as np
 import statsmodels.api as sm
 import warnings
 
-warnings.filterwarnings("ignore")
-
 """Address a particular question that arises from the data"""
 
 def predict_price(conn, latitude, longitude, date, property_type, size):
@@ -24,7 +22,10 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     Output:
       N/A
     """
- 
+    
+    # Turning warnings off
+    warnings.filterwarnings("ignore")
+    
     # Fetch Data from Database
     date_list = date.split('-')
     date_list = [int(i) for i in date_list]
