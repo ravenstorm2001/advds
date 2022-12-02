@@ -32,7 +32,7 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     from_date = f'{str(date_list[0]).zfill(4)}-{str(date_list[1]).zfill(2)}-{str(date_list[2]).zfill(2)}'
     date_list[0]+=3
     to_date = f'{str(date_list[0]).zfill(4)}-{str(date_list[1]).zfill(2)}-{str(date_list[2]).zfill(2)}'
-    data_gdf = download_data_to_gdf(conn, longitude, latitude, size, from_date, to_date)
+    data_gdf = download_data_to_gdf(conn, latitude, longitude, size, from_date, to_date)
 
     # Download POIS
     pois = download_pois(latitude, longitude, 0.1)
