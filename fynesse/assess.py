@@ -69,3 +69,17 @@ def plot_points_interest(pois, edges, data_gdf, latitude = 52.35, longitude = -2
     plt.tight_layout()
     mlai.write_figure(directory="./maps", filename="health-care-pois.svg")
 
+def plot_data(property_type, feature):
+    """
+    Function that plots price against features plots.
+    
+    Arguments:
+      property_type : string - property type (e.g. 'D','S','T')
+      feature : string - name of the defined feature
+    Output:
+      N/A
+    """
+    plt.scatter(plotting[plotting.property_type == property_type][feature], plotting[plotting.property_type == property_type]['price'])
+    plt.show()
+
+
