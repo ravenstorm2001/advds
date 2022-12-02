@@ -51,9 +51,9 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     y = data_gdf['price']
     design = np.ones(data_gdf.shape[0]).reshape(-1,1)
     if 'amenity' in pois.columns:
-        design = np.concatenate(design, 1/(data_gdf['amenity_proximity']).to_numpy().reshape(-1,1)),axis=1)
+        design = np.concatenate((design, 1/(data_gdf['amenity_proximity']).to_numpy().reshape(-1,1)),axis=1)
     if 'leisure' in pois.columns:
-        design = np.concatenate(design, (data_gdf['closest_leisure']).to_numpy().reshape(-1,1)),axis=1)
+        design = np.concatenate((design, (data_gdf['closest_leisure']).to_numpy().reshape(-1,1)),axis=1)
     m_linear_basis = sm.OLS(y,design)
     results_basis = m_linear_basis.fit()
 
@@ -65,10 +65,10 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     design_pred = [[1]]
     if 'amenity' in pois.columns:
         amenity_proximity_pred = pois_amenity[pois_amenity.geometry.distance(gdf_pred.geometry[0])<=0.01].count().amenity
-        design_pred = design_pred = np.concatenate(design_pred, [[1/(amenity_proximity_pred+1)]],axis=1)
+        design_pred = design_pred = np.concatenate((design_pred, [[1/(amenity_proximity_pred+1)]]),axis=1)
     if 'leisure' in pois.columns:
         closest_leisure_pred = pois_leisure[pois_leisure.geometry.distance(gdf_pred.geometry[0])<=0.01].min()
-        design_pred = np.concatenate(design_pred, [[closest_leisure_pred]],axis=1)
+        design_pred = np.concatenate((design_pred, [[closest_leisure_pred]]),axis=1)
     y_pred_linear_basis = results_basis.get_prediction(design_pred).summary_frame(alpha=0.05)
     print(results_basis.summary())
     print(y_pred_linear_basis)
