@@ -50,7 +50,7 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     # Train Model with Features
     if data_gdf[data_gdf.property_type == property_type].shape[0] != 0 :
         data_gdf = data_gdf[data_gdf.property_type == property_type]
-    print(data_gdf)
+    print(data_gdf[['closest_leisure', 'amenity_proximity']])
     y = data_gdf['price']
     design = np.ones(data_gdf.shape[0]).reshape(-1,1)
     if 'amenity' in pois.columns:
