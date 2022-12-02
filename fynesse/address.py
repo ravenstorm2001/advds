@@ -38,22 +38,22 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
 
     # Add amenity_proximity and closest_leisure Features to Data
     if 'amenity' in pois.columns:
-    pois_amenity = pois[pois.amenity.notnull()]
-    data_gdf['amenity_proximity'] = [pois_amenity[pois_amenity.geometry.distance(data_gdf.iloc[i].geometry)<=0.01].count().amenity for i in range(data_gdf.shape[0])]
-    data_gdf['amenity_proximity'] += 1
+        pois_amenity = pois[pois.amenity.notnull()]
+        data_gdf['amenity_proximity'] = [pois_amenity[pois_amenity.geometry.distance(data_gdf.iloc[i].geometry)<=0.01].count().amenity for i in range(data_gdf.shape[0])]
+        data_gdf['amenity_proximity'] += 1
     if 'leisure' in pois.columns:
-    pois_leisure = pois[pois.leisure.notnull()]
-    data_gdf['closest_leisure'] = [pois_leisure[pois_leisure.geometry.distance(data_gdf.iloc[i].geometry)<=0.01].min() for i in range(data_gdf.shape[0])]
+        pois_leisure = pois[pois.leisure.notnull()]
+        data_gdf['closest_leisure'] = [pois_leisure[pois_leisure.geometry.distance(data_gdf.iloc[i].geometry)<=0.01].min() for i in range(data_gdf.shape[0])]
 
     # Train Model with Features
     if data_gdf[data_gdf.property_type == property_type].shape[0] != 0 :
-    data_gdf = data_gdf[data_gdf.property_type == property_type]
+        data_gdf = data_gdf[data_gdf.property_type == property_type]
     y = data_gdf['price']
     design = np.ones(data_gdf.shape[0]).reshape(-1,1)
     if 'amenity' in pois.columns:
-    design = np.concatenate(design, 1/(data_gdf['amenity_proximity']).to_numpy().reshape(-1,1)),axis=1)
+        design = np.concatenate(design, 1/(data_gdf['amenity_proximity']).to_numpy().reshape(-1,1)),axis=1)
     if 'leisure' in pois.columns:
-    design = np.concatenate(design, (data_gdf['closest_leisure']).to_numpy().reshape(-1,1)),axis=1)
+        design = np.concatenate(design, (data_gdf['closest_leisure']).to_numpy().reshape(-1,1)),axis=1)
     m_linear_basis = sm.OLS(y,design)
     results_basis = m_linear_basis.fit()
 
@@ -64,11 +64,11 @@ def predict_price(conn, latitude, longitude, date, property_type, size):
     gdf_pred = gpd.GeoDataFrame(df_pred, geometry=gpd.points_from_xy(df_pred.Longitude, df_pred.Latitude))
     design_pred = [[1]]
     if 'amenity' in pois.columns:
-    amenity_proximity_pred = pois_amenity[pois_amenity.geometry.distance(gdf_pred.geometry[0])<=0.01].count().amenity
-    design_pred = design_pred = np.concatenate(design_pred, [[1/(amenity_proximity_pred+1)]],axis=1)
+        amenity_proximity_pred = pois_amenity[pois_amenity.geometry.distance(gdf_pred.geometry[0])<=0.01].count().amenity
+        design_pred = design_pred = np.concatenate(design_pred, [[1/(amenity_proximity_pred+1)]],axis=1)
     if 'leisure' in pois.columns:
-    closest_leisure_pred = pois_leisure[pois_leisure.geometry.distance(gdf_pred.geometry[0])<=0.01].min()
-    design_pred = np.concatenate(design_pred, [[closest_leisure_pred]],axis=1)
+        closest_leisure_pred = pois_leisure[pois_leisure.geometry.distance(gdf_pred.geometry[0])<=0.01].min()
+        design_pred = np.concatenate(design_pred, [[closest_leisure_pred]],axis=1)
     y_pred_linear_basis = results_basis.get_prediction(design_pred).summary_frame(alpha=0.05)
     print(results_basis.summary())
     print(y_pred_linear_basis)
