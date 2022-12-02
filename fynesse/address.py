@@ -3,7 +3,7 @@ from .access import *
 
 import numpy as np
 import statsmodels.api as sm
-import warning
+import warnings
 
 warnings.filterwarnings("ignore")
 
